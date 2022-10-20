@@ -1,0 +1,25 @@
+name: Update GitHub project
+on:
+  workflow_dispatch:
+  schedule:
+    # 14:00 UTC
+    - cron:  '0 14 * * *'
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+      - run: pip install -r requirements.txt
+      - run: python update_items_with_pain_scores.py
+        env:
+          GH_ORGANIZATION_NAME: nextstrain
+          GH_PROJECT_NUMBER: 11
+          GH_NEXTSTRAIN_BOT_PROJECTS_AUTOMATION_PAT: ${{ secrets.GH_NEXTSTRAIN_BOT_PROJECTS_AUTOMATION_PAT }}
+      - run: python add_org_issues_to_projects_beta.py
+        env:
+          GH_ORGANIZATION_NAME: nextstrain
+          GH_PROJECT_NUMBER: 11
+          GH_NEXTSTRAIN_BOT_PROJECTS_AUTOMATION_PAT: ${{ secrets.GH_NEXTSTRAIN_BOT_PROJECTS_AUTOMATION_PAT }}
