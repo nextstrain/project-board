@@ -23,6 +23,46 @@ def get_json_result(query, variables=None):
     return result
 
 
+def get_all_items(org_name, project_number):
+    query = """query($after: String, $login: String!, $projectNumber: Int!) {
+        organization(login: $login) {
+            projectNext(number: $projectNumber) {
+                items(first: 100, after: $after) {
+                    pageInfo {
+                        hasNextPage
+                        endCursor
+                    }
+                    nodes {
+                        id
+                        fieldValues(first:100) {
+                            nodes {
+                                projectField {
+                                    id
+                                    name
+                                }
+                                value
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    """
+    variables = {
+        "login": org_name,
+        "projectNumber": project_number
+    }
+    nodes = list()
+    hasNextPage = True
+    while hasNextPage:
+        response = get_json_result(query, variables)
+        hasNextPage = response["data"]["organization"]["projectNext"]["items"]["pageInfo"]["hasNextPage"]
+        variables["after"] = response["data"]["organization"]["projectNext"]["items"]["pageInfo"]["endCursor"]
+        nodes.extend(response["data"]["organization"]["projectNext"]["items"]["nodes"])
+    return nodes
+
+
 def update_project_item_field(project_id, item_id, field_id, value):
     mutation = """mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: String!) {
         updateProjectNextItemField(input: { projectId: $projectId itemId: $itemId fieldId: $fieldId value: $value }) {

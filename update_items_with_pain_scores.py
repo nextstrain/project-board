@@ -2,7 +2,7 @@ import json
 from helpers import (
     GH_ORGANIZATION_NAME,
     GH_PROJECT_NUMBER,
-    get_json_result,
+    get_all_items,
     update_project_item_field,
     get_project_id,
     get_project_fields_by_name,
@@ -22,7 +22,7 @@ class PainScoreCalculator():
         fields_by_name = get_project_fields_by_name(self.org_name, self.project_number)
         field_option_rank = self.get_field_option_rank(fields_by_name)
         print('getting items...')
-        items = self.get_all_items()
+        items = get_all_items(self.org_name, self.project_number)
         print('calculating pain scores...')
         item_pain_scores = self.get_item_pain_scores(items, field_option_rank)
         pain_score_field_id = fields_by_name["User Pain Score"]["id"]
@@ -31,45 +31,6 @@ class PainScoreCalculator():
         print('done.')
         points_after = get_remaining_points()
         print(f'GitHub GraphQL API points used: {points_before - points_after}')
-
-    def get_all_items(self):
-        query = """query($after: String, $login: String!, $projectNumber: Int!) {
-            organization(login: $login) {
-                projectNext(number: $projectNumber) {
-                    items(first: 100, after: $after) {
-                        pageInfo {
-                            hasNextPage
-                            endCursor
-                        }
-                        nodes {
-                            id
-                            fieldValues(first:100) {
-                                nodes {
-                                    projectField {
-                                        id
-                                        name
-                                    }
-                                    value
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        """
-        variables = {
-            "login": self.org_name,
-            "projectNumber": self.project_number
-        }
-        nodes = list()
-        hasNextPage = True
-        while hasNextPage:
-            response = get_json_result(query, variables)
-            hasNextPage = response["data"]["organization"]["projectNext"]["items"]["pageInfo"]["hasNextPage"]
-            variables["after"] = response["data"]["organization"]["projectNext"]["items"]["pageInfo"]["endCursor"]
-            nodes.extend(response["data"]["organization"]["projectNext"]["items"]["nodes"])
-        return nodes
 
     def get_field_option_rank(self, fields_by_name):
         """
