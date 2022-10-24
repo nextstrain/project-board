@@ -7,7 +7,7 @@ GH_ORGANIZATION_NAME = os.environ['GH_ORGANIZATION_NAME']
 GH_PROJECT_NUMBER = int(os.environ['GH_PROJECT_NUMBER'])
 
 GH_GRAPHQL_URL = 'https://api.github.com/graphql'
-TOKEN = os.environ['GH_NEXTSTRAIN_BOT_PROJECTS_AUTOMATION_PAT'] # add your PAT with read:org and write:org scope
+TOKEN = os.environ['GITHUB_TOKEN'] # add your PAT with read:org and write:org scope
 if not TOKEN.startswith('ghp_'):
     print("WARNING: Github token does not start with 'ghp_'. If an error occurs, check that the token is configured properly.")
 
