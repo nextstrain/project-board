@@ -13,8 +13,14 @@ if not TOKEN.startswith('ghp_'):
 
 
 def get_json_result(query, variables=None):
+    # Manually create a session to disable the behavior of .netrc overriding
+    # the Authorization header during local dev¹.
+    # ¹https://github.com/psf/requests/issues/3929
+    session = requests.Session()
+    session.trust_env = False
     headers={'Authorization': f'token {TOKEN}'}
-    r = requests.post(GH_GRAPHQL_URL, json={'query': query, 'variables': variables}, headers=headers)
+    r = session.post(GH_GRAPHQL_URL, json={'query': query, 'variables': variables}, headers=headers)
+
     if r.status_code != 200:
         raise Exception(f'[{r.status_code}] GitHub GraphQL API response: {r.text}')
     result = json.loads(r.text)
