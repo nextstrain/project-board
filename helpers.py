@@ -31,19 +31,20 @@ def get_json_result(query, variables=None):
     return result
 
 
-def get_all_items(org_name, project_number):
+def get_items(org_name, project_number, limit=0):
     """Get items from a GitHub project."""
-    query = """query($after: String, $login: String!, $projectNumber: Int!) {
+    per_page = limit if limit != 0 else 100
+    query = """query($after: String, $login: String!, $projectNumber: Int!, $perPage: Int!) {
         organization(login: $login) {
             projectNext(number: $projectNumber) {
-                items(first: 100, after: $after) {
+                items(first: $perPage, after: $after) {
                     pageInfo {
                         hasNextPage
                         endCursor
                     }
                     nodes {
                         id
-                        fieldValues(first:100) {
+                        fieldValues(first: $perPage) {
                             nodes {
                                 projectField {
                                     id
@@ -60,13 +61,14 @@ def get_all_items(org_name, project_number):
     """
     variables = {
         "login": org_name,
-        "projectNumber": project_number
+        "projectNumber": project_number,
+        "perPage": per_page,
     }
     nodes = list()
     hasNextPage = True
     while hasNextPage:
         response = get_json_result(query, variables)
-        hasNextPage = response["data"]["organization"]["projectNext"]["items"]["pageInfo"]["hasNextPage"]
+        hasNextPage = response["data"]["organization"]["projectNext"]["items"]["pageInfo"]["hasNextPage"] if limit == 0 else False
         variables["after"] = response["data"]["organization"]["projectNext"]["items"]["pageInfo"]["endCursor"]
         nodes.extend(response["data"]["organization"]["projectNext"]["items"]["nodes"])
     return nodes

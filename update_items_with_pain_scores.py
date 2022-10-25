@@ -1,7 +1,7 @@
 from helpers import (
     GH_ORGANIZATION_NAME,
     GH_PROJECT_NUMBER,
-    get_all_items,
+    get_items,
     print_usage,
     update_project_item_field,
     get_project_id,
@@ -19,7 +19,7 @@ def main():
     field_option_rank = get_field_option_rank(fields_by_name)
 
     print('getting items...')
-    items = get_all_items(org_name, project_number)
+    items = get_items(org_name, project_number)
 
     print('calculating pain scores...')
     item_pain_scores = get_item_pain_scores(items, field_option_rank)
