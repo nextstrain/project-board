@@ -166,3 +166,16 @@ def get_remaining_points():
     """
     result = get_json_result(query)
     return int(result["data"]["rateLimit"]["remaining"])
+
+
+def print_usage(func):
+    """Decorator function to log usage of GitHub GraphQL API points."""
+    def wrapper(*args, **kwargs):
+        points_before = get_remaining_points()
+        print(f'GitHub GraphQL API points available: {points_before}')
+        result = func(*args, **kwargs)
+        points_after = get_remaining_points()
+        print(f'GitHub GraphQL API points used: {points_before - points_after}')
+        print(f'GitHub GraphQL API points remaining: {points_after}')
+        return result
+    return wrapper

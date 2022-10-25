@@ -6,7 +6,7 @@ from helpers import (
     get_json_result,
     get_project_id,
     add_issue_to_project,
-    get_remaining_points,
+    print_usage,
 )
 
 
@@ -44,7 +44,8 @@ def get_recent_open_issue_ids(org_name:str, min_date:date, exclude_authors:List[
     return [node['id'] for node in nodes]
 
 
-if __name__ == '__main__':
+@print_usage
+def main():
     """
     Find all issues/PRs that are:
     1. under the nextstrain organization
@@ -54,7 +55,6 @@ if __name__ == '__main__':
 
     and add them to the planning project.
     """
-    points_before = get_remaining_points()
     project_id = get_project_id(org_name=GH_ORGANIZATION_NAME, project_number=GH_PROJECT_NUMBER)
     min_date = date.today() - timedelta(days=14)
     exclude_authors = ['app/dependabot', 'nextstrain-bot']
@@ -66,6 +66,8 @@ if __name__ == '__main__':
         print(f'adding issue {i + 1}/{len(issue_ids)}')
         add_issue_to_project(issue_id, project_id)
     print('done')
-    points_after = get_remaining_points()
-    print(f'GitHub GraphQL API points used: {points_before - points_after}')
     # TODO: update non-draft PRs to "In Review" state
+
+
+if __name__ == '__main__':
+    main()

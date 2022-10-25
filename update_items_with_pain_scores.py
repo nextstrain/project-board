@@ -3,10 +3,10 @@ from helpers import (
     GH_ORGANIZATION_NAME,
     GH_PROJECT_NUMBER,
     get_all_items,
+    print_usage,
     update_project_item_field,
     get_project_id,
     get_project_fields_by_name,
-    get_remaining_points,
 )
 
 
@@ -16,8 +16,8 @@ class PainScoreCalculator():
         self.org_name = GH_ORGANIZATION_NAME
         self.project_number = GH_PROJECT_NUMBER
 
+    @print_usage
     def run(self):
-        points_before = get_remaining_points()
         print('getting project fields...')
         fields_by_name = get_project_fields_by_name(self.org_name, self.project_number)
         field_option_rank = self.get_field_option_rank(fields_by_name)
@@ -29,8 +29,6 @@ class PainScoreCalculator():
         print('updating project items with pain scores...')
         self.write_item_pain_scores(item_pain_scores, pain_score_field_id)
         print('done.')
-        points_after = get_remaining_points()
-        print(f'GitHub GraphQL API points used: {points_before - points_after}')
 
     def get_field_option_rank(self, fields_by_name):
         """Get a mapping of pain score column field ID to options.
