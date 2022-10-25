@@ -1,4 +1,3 @@
-import json
 from helpers import (
     GH_ORGANIZATION_NAME,
     GH_PROJECT_NUMBER,
@@ -66,12 +65,10 @@ def get_field_option_rank(fields_by_name):
     }
     """
     field_option_rank = dict()
-    for name in fields_by_name:
+    for name, field in fields_by_name.items():
         if name in {'Type', 'Priority', 'Likelihood'}:
-            field = fields_by_name[name]
-            settings = json.loads(field['settings'])
             # cast first character of option name to integer
-            option_id_to_int_rank = {option['id']: int(option['name'][0]) for option in settings['options']}
+            option_id_to_int_rank = {option['id']: int(option['name'][0]) for option in field['settings']['options']}
             field_option_rank[field['id']] = option_id_to_int_rank
     return field_option_rank
 

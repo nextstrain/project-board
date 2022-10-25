@@ -131,9 +131,27 @@ def get_project_fields_by_name(org_name, project_number):
     }
     result = get_json_result(query, variables)
     return {
-        item['name']: item
-        for item in result['data']['organization']['projectNext']['fields']['nodes']
+        field['name']: _expand_project_fields_settings(field)
+        for field in result['data']['organization']['projectNext']['fields']['nodes']
     }
+
+
+def _expand_project_fields_settings(field):
+    """
+    Options are stored in settings.options, but settings is just a string.
+    Make it more accessible by converting settings to a JSON object, and
+    """
+
+    # Convert settings to a JSON object
+    field['settings'] = json.loads(field['settings'])
+
+    if field['settings'] and 'options' in field['settings']:
+        # Add a new entry which makes options lookups easier.
+        field['settings']['optionsByName'] = {
+            option['name']: option
+            for option in field['settings']['options']
+        }
+    return field
 
 
 def add_issue_to_project(issue_id, project_id):
