@@ -152,6 +152,7 @@ def add_issue_to_project(issue_id, project_id):
     }
     return get_json_result(mutation, variables)
 
+
 def get_remaining_points():
     """Get the remaining GitHub API points for the access token defined at the global scope.
 
