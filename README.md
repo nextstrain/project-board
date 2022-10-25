@@ -24,3 +24,13 @@ GitHub projects (beta) has limited automation. You can see what is enabled [here
     - A PR is merged or closed.
     - An issue is closed.
 - The item is **archived** when its status is set to Done. See the workflow for the exact query.
+
+### Local development
+
+These environment variables are required for the scripts to function properly.
+
+```sh
+export GH_ORGANIZATION_NAME='nextstrain'
+export GH_PROJECT_NUMBER='11'
+export GITHUB_TOKEN='' # This should be a GitHub token with read:org and write:org scope
+```

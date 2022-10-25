@@ -33,7 +33,10 @@ class PainScoreCalculator():
         print(f'GitHub GraphQL API points used: {points_before - points_after}')
 
     def get_field_option_rank(self, fields_by_name):
-        """
+        """Get a mapping of pain score column field ID to options.
+
+        Options are represented as a mapping of option ID to integer value.
+
         Returns
         -------
         {
@@ -72,6 +75,7 @@ class PainScoreCalculator():
         return field_option_rank
 
     def get_item_pain_scores(self, items, field_option_rank):
+        """Get a mapping of item IDs to calculated pain scores."""
         item_pain_scores = dict()
         for item in items:
             pain_score = None
@@ -88,6 +92,7 @@ class PainScoreCalculator():
         return item_pain_scores
 
     def write_item_pain_scores(self, item_pain_scores, pain_score_field_id):
+        """Update the project with pain scores for each item."""
         project_id = get_project_id(self.org_name, self.project_number)
         for i, (item_id, score) in enumerate(item_pain_scores.items()):
             print(f'updating pain score for issue {i + 1}/{len(item_pain_scores)}')

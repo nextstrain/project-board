@@ -13,6 +13,8 @@ if not TOKEN.startswith('ghp_'):
 
 
 def get_json_result(query, variables=None):
+    """Get JSON result of a GraphQL query or mutation."""
+
     # Manually create a session to disable the behavior of .netrc overriding
     # the Authorization header during local dev¹.
     # ¹https://github.com/psf/requests/issues/3929
@@ -30,6 +32,7 @@ def get_json_result(query, variables=None):
 
 
 def get_all_items(org_name, project_number):
+    """Get items from a GitHub project."""
     query = """query($after: String, $login: String!, $projectNumber: Int!) {
         organization(login: $login) {
             projectNext(number: $projectNumber) {
@@ -70,6 +73,7 @@ def get_all_items(org_name, project_number):
 
 
 def update_project_item_field(project_id, item_id, field_id, value):
+    """Update the field value of an item in a project."""
     mutation = """mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: String!) {
         updateProjectNextItemField(input: { projectId: $projectId itemId: $itemId fieldId: $fieldId value: $value }) {
             projectNextItem {
@@ -88,6 +92,7 @@ def update_project_item_field(project_id, item_id, field_id, value):
 
 
 def get_project_id(org_name, project_number):
+    """Get the ID of a project."""
     query = """query($login: String!, $projectNumber: Int!) {
         organization(login: $login) {
             projectNext(number: $projectNumber) {
@@ -105,6 +110,7 @@ def get_project_id(org_name, project_number):
 
 
 def get_project_fields_by_name(org_name, project_number):
+    """Get a mapping of field names to a JSON object."""
     query = """query($login: String!, $projectNumber: Int!) {
         organization(login: $login) {
             projectNext(number: $projectNumber) {
@@ -131,6 +137,7 @@ def get_project_fields_by_name(org_name, project_number):
 
 
 def add_issue_to_project(issue_id, project_id):
+    """Add an issue to a project."""
     mutation = """mutation($projectId: ID!, $issueId: ID!) {
         addProjectNextItem(input: { projectId: $projectId contentId: $issueId }) {
             projectNextItem {
@@ -146,6 +153,10 @@ def add_issue_to_project(issue_id, project_id):
     return get_json_result(mutation, variables)
 
 def get_remaining_points():
+    """Get the remaining GitHub API points for the access token defined at the global scope.
+
+    More about the limit: https://docs.github.com/en/graphql/overview/resource-limitations#rate-limit
+    """
     query = """query {
         rateLimit {
             remaining
