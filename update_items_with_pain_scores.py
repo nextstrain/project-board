@@ -68,7 +68,7 @@ def get_field_option_rank(fields_by_name):
     for name, field in fields_by_name.items():
         if name in {'Type', 'Priority', 'Likelihood'}:
             # cast first character of option name to integer
-            option_id_to_int_rank = {option['id']: int(option['name'][0]) for option in field['settings']['options']}
+            option_id_to_int_rank = {option['id']: int(option['name'][0]) for option in field['options']}
             field_option_rank[field['id']] = option_id_to_int_rank
     return field_option_rank
 
@@ -79,7 +79,10 @@ def get_item_pain_scores(items, field_option_rank):
     for item in items:
         pain_score = None
         for field in item['fieldValues']['nodes']:
-            field_id = field['projectField']['id']
+            if 'id' not in field:
+                # Item's field is not set.
+                continue
+            field_id = field['id']
             if field_id in field_option_rank.keys():
                 if not pain_score:
                     pain_score = 1

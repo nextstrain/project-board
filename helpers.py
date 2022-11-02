@@ -7,7 +7,7 @@ GH_ORGANIZATION_NAME = os.environ['GH_ORGANIZATION_NAME']
 GH_PROJECT_NUMBER = int(os.environ['GH_PROJECT_NUMBER'])
 
 GH_GRAPHQL_URL = 'https://api.github.com/graphql'
-TOKEN = os.environ['GITHUB_TOKEN'] # add your PAT with read:org and write:org scope
+TOKEN = os.environ['GITHUB_TOKEN'] # add your PAT with read:project and project scope
 if not TOKEN.startswith('ghp_'):
     print("WARNING: Github token does not start with 'ghp_'. If an error occurs, check that the token is configured properly.")
 
@@ -32,11 +32,14 @@ def get_json_result(query, variables=None):
 
 
 def get_items(org_name, project_number, limit=0):
-    """Get items from a GitHub project."""
+    """Get items from a GitHub project.
+
+    Include information for any single-select fields with a value.
+    """
     per_page = limit if limit != 0 else 100
     query = """query($after: String, $login: String!, $projectNumber: Int!, $perPage: Int!) {
         organization(login: $login) {
-            projectNext(number: $projectNumber) {
+            projectV2(number: $projectNumber) {
                 items(first: $perPage, after: $after) {
                     pageInfo {
                         hasNextPage
@@ -46,11 +49,10 @@ def get_items(org_name, project_number, limit=0):
                         id
                         fieldValues(first: $perPage) {
                             nodes {
-                                projectField {
+                                ... on ProjectV2ItemFieldSingleSelectValue {
                                     id
                                     name
                                 }
-                                value
                             }
                         }
                     }
@@ -68,17 +70,17 @@ def get_items(org_name, project_number, limit=0):
     hasNextPage = True
     while hasNextPage:
         response = get_json_result(query, variables)
-        hasNextPage = response["data"]["organization"]["projectNext"]["items"]["pageInfo"]["hasNextPage"] if limit == 0 else False
-        variables["after"] = response["data"]["organization"]["projectNext"]["items"]["pageInfo"]["endCursor"]
-        nodes.extend(response["data"]["organization"]["projectNext"]["items"]["nodes"])
+        hasNextPage = response["data"]["organization"]["projectV2"]["items"]["pageInfo"]["hasNextPage"] if limit == 0 else False
+        variables["after"] = response["data"]["organization"]["projectV2"]["items"]["pageInfo"]["endCursor"]
+        nodes.extend(response["data"]["organization"]["projectV2"]["items"]["nodes"])
     return nodes
 
 
 def update_project_item_field(project_id, item_id, field_id, value):
     """Update the field value of an item in a project."""
     mutation = """mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: String!) {
-        updateProjectNextItemField(input: { projectId: $projectId itemId: $itemId fieldId: $fieldId value: $value }) {
-            projectNextItem {
+        updateProjectV2ItemFieldValue(input: { projectId: $projectId itemId: $itemId fieldId: $fieldId value: $value }) {
+            projectV2Item {
                 id
             }
         }
@@ -97,7 +99,7 @@ def get_project_id(org_name, project_number):
     """Get the ID of a project."""
     query = """query($login: String!, $projectNumber: Int!) {
         organization(login: $login) {
-            projectNext(number: $projectNumber) {
+            projectV2(number: $projectNumber) {
                 id
             }
         }
@@ -108,19 +110,28 @@ def get_project_id(org_name, project_number):
         "projectNumber": project_number
     }
     result = get_json_result(query, variables)
-    return result['data']['organization']['projectNext']['id']
+    return result['data']['organization']['projectV2']['id']
 
 
 def get_project_fields_by_name(org_name, project_number):
     """Get a mapping of field names to a JSON object."""
     query = """query($login: String!, $projectNumber: Int!) {
         organization(login: $login) {
-            projectNext(number: $projectNumber) {
+            projectV2(number: $projectNumber) {
                 fields(first: 100) {
                     nodes {
-                        id
-                        name
-                        settings
+                        ... on ProjectV2Field {
+                            id
+                            name
+                        }
+                        ... on ProjectV2SingleSelectField {
+                            id
+                            name
+                            options {
+                                id
+                                name
+                            }
+                        }
                     }
                 }
             }
@@ -133,34 +144,17 @@ def get_project_fields_by_name(org_name, project_number):
     }
     result = get_json_result(query, variables)
     return {
-        field['name']: _expand_project_fields_settings(field)
-        for field in result['data']['organization']['projectNext']['fields']['nodes']
+        field['name']: field
+        for field in result['data']['organization']['projectV2']['fields']['nodes']
+        if 'name' in field
     }
-
-
-def _expand_project_fields_settings(field):
-    """
-    Options are stored in settings.options, but settings is just a string.
-    Make it more accessible by converting settings to a JSON object, and
-    """
-
-    # Convert settings to a JSON object
-    field['settings'] = json.loads(field['settings'])
-
-    if field['settings'] and 'options' in field['settings']:
-        # Add a new entry which makes options lookups easier.
-        field['settings']['optionsByName'] = {
-            option['name']: option
-            for option in field['settings']['options']
-        }
-    return field
 
 
 def add_issue_to_project(issue_id, project_id):
     """Add an issue to a project."""
     mutation = """mutation($projectId: ID!, $issueId: ID!) {
-        addProjectNextItem(input: { projectId: $projectId contentId: $issueId }) {
-            projectNextItem {
+        addProjectV2ItemById(input: { projectId: $projectId contentId: $issueId }) {
+            item {
                 id
             }
         }

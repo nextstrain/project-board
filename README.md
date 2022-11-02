@@ -32,5 +32,5 @@ These environment variables are required for the scripts to function properly.
 ```sh
 export GH_ORGANIZATION_NAME='nextstrain'
 export GH_PROJECT_NUMBER='11'
-export GITHUB_TOKEN='' # This should be a GitHub token with read:org and write:org scope
+export GITHUB_TOKEN='' # This should be a GitHub token with read:project and project scope
 ```
