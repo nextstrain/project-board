@@ -15,7 +15,7 @@ The Nextstrain team uses [a GitHub project](https://github.com/orgs/nextstrain/p
 
 New items are added automatically every day using [this GitHub Actions workflow](https://github.com/nextstrain/planning/actions/workflows/update_github_project.yml).
 
-GitHub projects (beta) has limited automation. You can see what is enabled [here](https://github.com/orgs/nextstrain/projects/11/workflows):
+GitHub projects has limited automation. You can see what is enabled [here](https://github.com/orgs/nextstrain/projects/11/workflows):
 
 - The status is set to **New** when:
     - An issue/PR is added to the project.
