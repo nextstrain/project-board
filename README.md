@@ -15,7 +15,7 @@ The Nextstrain team uses [a GitHub project](https://github.com/orgs/nextstrain/p
 
 New items are added automatically every day using [this GitHub Actions workflow](https://github.com/nextstrain/planning/actions/workflows/update_github_project.yml).
 
-GitHub projects (beta) has limited automation. You can see what is enabled [here](https://github.com/orgs/nextstrain/projects/11/workflows):
+GitHub projects has limited automation. You can see what is enabled [here](https://github.com/orgs/nextstrain/projects/11/workflows):
 
 - The status is set to **New** when:
     - An issue/PR is added to the project.
@@ -23,3 +23,14 @@ GitHub projects (beta) has limited automation. You can see what is enabled [here
 - The status is set to **Done** when:
     - A PR is merged or closed.
     - An issue is closed.
+- The item is **archived** when its status is set to Done. See the workflow for the exact query.
+
+### Local development
+
+These environment variables are required for the scripts to function properly.
+
+```sh
+export GH_ORGANIZATION_NAME='nextstrain'
+export GH_PROJECT_NUMBER='11'
+export GITHUB_TOKEN='' # This should be a GitHub token with read:project and project scope
+```
