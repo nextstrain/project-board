@@ -23,3 +23,4 @@ GitHub projects (beta) has limited automation. You can see what is enabled [here
 - The status is set to **Done** when:
     - A PR is merged or closed.
     - An issue is closed.
+- The item is **archived** when its status is set to Done. See the workflow for the exact query.
