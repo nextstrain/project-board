@@ -17,9 +17,9 @@ jobs:
         env:
           GH_ORGANIZATION_NAME: nextstrain
           GH_PROJECT_NUMBER: 11
-          GITHUB_TOKEN: ${{ secrets.GH_NEXTSTRAIN_BOT_PROJECTS_AUTOMATION_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_NEXTSTRAIN_BOT_PROJECT }}
       - run: python add_org_issues_to_projects.py
         env:
           GH_ORGANIZATION_NAME: nextstrain
           GH_PROJECT_NUMBER: 11
-          GITHUB_TOKEN: ${{ secrets.GH_NEXTSTRAIN_BOT_PROJECTS_AUTOMATION_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_NEXTSTRAIN_BOT_PROJECT }}
