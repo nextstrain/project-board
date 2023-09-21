@@ -1,6 +1,6 @@
 # Nextstrain GitHub Project
 
-The Nextstrain team uses [a GitHub project](https://github.com/orgs/nextstrain/projects/11) to plan and track development work across repositories.
+The Nextstrain team previously used [a GitHub project](https://github.com/orgs/nextstrain/projects/11) to plan and track development work across repositories. It is no longer maintained, but the scripts used to automate populating the board with items is kept in this repository for archival purposes.
 
 ### Status
 
